@@ -115,10 +115,7 @@ The FastAPI backend will automatically serve the frontend production build from 
 
 ## Deployment to Railway
 
-This project is configured for deployment to Railway.app with the following files:
-- `railway.toml` - Railway build and deploy configuration
-- `nixpacks.toml` - Nixpacks configuration for Python + Node.js
-- `Procfile` - Alternative process configuration
+This is a **monorepo** project that requires special configuration on Railway.
 
 ### Deploy Steps
 
@@ -127,28 +124,34 @@ This project is configured for deployment to Railway.app with the following file
    - Click "New Project" → "Deploy from GitHub repo"
    - Select your Chronicler repository
 
-2. **Configure Environment Variables** (optional for now)
+2. **IMPORTANT: Set Root Directory**
+   - After deployment starts, go to your service Settings
+   - Find "Source" section
+   - Set **Root Directory** to `/backend`
+   - This tells Railway to build from the backend directory where Python files are located
+
+3. **Configure Environment Variables** (optional for now)
    - No environment variables are required for the minimal setup
    - You'll need to add `DATABASE_URL`, `SECRET_KEY`, etc. later
 
-3. **Deploy**
-   - Railway will automatically detect the configuration files
-   - The build process will:
-     - Install Python dependencies from `backend/requirements.txt`
-     - Install Node.js dependencies and build the frontend
-     - Start the FastAPI server which serves both API and frontend
+4. **How the Build Works**
+   - Railway detects Python from `requirements.txt` in the backend directory
+   - Installs Python dependencies automatically
+   - Builds the Vue frontend from `../frontend`
+   - Copies the built frontend to `backend/static/`
+   - Starts the FastAPI server which serves both API and frontend
 
-4. **Access Your App**
+5. **Access Your App**
    - Railway will provide a URL like `https://chronicler-production.up.railway.app`
    - The health check endpoint: `https://your-app.railway.app/health`
 
 ### Railway Configuration Files
 
-- **railway.toml**: Main Railway configuration
-- **nixpacks.toml**: Tells Railway to use both Python 3.11 and Node.js 20
-- **Procfile**: Specifies the start command for the web service
+The configuration files are in the `backend/` directory:
+- **backend/railway.toml**: Railway deployment configuration
+- **backend/nixpacks.toml**: Tells Railway to install Node.js and build the frontend during the build phase
 
-The deployment builds the frontend and serves it through the FastAPI backend, creating a single unified service.
+This setup creates a single unified service that serves both the API and the static frontend.
 
 ## Current Status
 

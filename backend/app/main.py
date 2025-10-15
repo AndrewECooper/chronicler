@@ -40,10 +40,23 @@ async def api_root():
     }
 
 # Serve static files (Vue frontend) - must be last
-# Check if frontend dist folder exists
-frontend_dist = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "frontend", "dist")
-if os.path.exists(frontend_dist):
-    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+# Check multiple possible locations for the frontend dist folder
+possible_dist_paths = [
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "frontend", "dist"),  # Development
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "static"),  # Production (Railway)
+]
+
+frontend_dist = None
+for path in possible_dist_paths:
+    if os.path.exists(path):
+        frontend_dist = path
+        break
+
+if frontend_dist:
+    # Mount assets directory if it exists
+    assets_dir = os.path.join(frontend_dist, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
@@ -53,4 +66,8 @@ if os.path.exists(frontend_dist):
         if os.path.isfile(file_path):
             return FileResponse(file_path)
         # Otherwise, serve index.html (for Vue Router)
-        return FileResponse(os.path.join(frontend_dist, "index.html"))
+        index_path = os.path.join(frontend_dist, "index.html")
+        if os.path.isfile(index_path):
+            return FileResponse(index_path)
+        # If no frontend is available, return a simple message
+        return {"message": "Frontend not available", "api": "/api"}
