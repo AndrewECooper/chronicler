@@ -115,7 +115,7 @@ The FastAPI backend will automatically serve the frontend production build from 
 
 ## Deployment to Railway
 
-This is a **monorepo** project that requires special configuration on Railway.
+This is a **monorepo** project with configuration files in the root directory.
 
 ### Deploy Steps
 
@@ -124,20 +124,18 @@ This is a **monorepo** project that requires special configuration on Railway.
    - Click "New Project" → "Deploy from GitHub repo"
    - Select your Chronicler repository
 
-2. **IMPORTANT: Set Root Directory**
-   - After deployment starts, go to your service Settings
-   - Find "Source" section
-   - Set **Root Directory** to `/backend`
-   - This tells Railway to build from the backend directory where Python files are located
+2. **Railway Auto-Detection**
+   - Railway will automatically detect the `nixpacks.toml` file in the root
+   - No manual configuration needed!
 
 3. **Configure Environment Variables** (optional for now)
    - No environment variables are required for the minimal setup
    - You'll need to add `DATABASE_URL`, `SECRET_KEY`, etc. later
 
 4. **How the Build Works**
-   - Railway detects Python from `requirements.txt` in the backend directory
-   - Installs Python dependencies automatically
-   - Builds the Vue frontend from `../frontend`
+   - Railway uses both Python 3.11 and Node.js 20 (specified in nixpacks.toml)
+   - Installs Python dependencies from `backend/requirements.txt`
+   - Installs Node.js dependencies and builds the Vue frontend
    - Copies the built frontend to `backend/static/`
    - Starts the FastAPI server which serves both API and frontend
 
@@ -147,9 +145,11 @@ This is a **monorepo** project that requires special configuration on Railway.
 
 ### Railway Configuration Files
 
-The configuration files are in the `backend/` directory:
-- **backend/railway.toml**: Railway deployment configuration
-- **backend/nixpacks.toml**: Tells Railway to install Node.js and build the frontend during the build phase
+- **railway.toml**: Railway deployment configuration
+- **railway.json**: Alternative JSON configuration
+- **nixpacks.toml**: Tells Railway to use Python 3.11 and Node.js 20, with custom build steps
+
+The configuration files in the `backend/` directory are for reference only.
 
 This setup creates a single unified service that serves both the API and the static frontend.
 
