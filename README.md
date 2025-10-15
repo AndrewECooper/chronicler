@@ -113,9 +113,42 @@ This creates a `dist` folder with the production build.
 ### Backend
 The FastAPI backend will automatically serve the frontend production build from the `dist` folder when it exists.
 
-## Deployment
+## Deployment to Railway
 
-See the PRD.md for deployment instructions to Railway.app.
+This project is configured for deployment to Railway.app with the following files:
+- `railway.toml` - Railway build and deploy configuration
+- `nixpacks.toml` - Nixpacks configuration for Python + Node.js
+- `Procfile` - Alternative process configuration
+
+### Deploy Steps
+
+1. **Connect GitHub Repository**
+   - Go to [Railway.app](https://railway.app)
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select your Chronicler repository
+
+2. **Configure Environment Variables** (optional for now)
+   - No environment variables are required for the minimal setup
+   - You'll need to add `DATABASE_URL`, `SECRET_KEY`, etc. later
+
+3. **Deploy**
+   - Railway will automatically detect the configuration files
+   - The build process will:
+     - Install Python dependencies from `backend/requirements.txt`
+     - Install Node.js dependencies and build the frontend
+     - Start the FastAPI server which serves both API and frontend
+
+4. **Access Your App**
+   - Railway will provide a URL like `https://chronicler-production.up.railway.app`
+   - The health check endpoint: `https://your-app.railway.app/health`
+
+### Railway Configuration Files
+
+- **railway.toml**: Main Railway configuration
+- **nixpacks.toml**: Tells Railway to use both Python 3.11 and Node.js 20
+- **Procfile**: Specifies the start command for the web service
+
+The deployment builds the frontend and serves it through the FastAPI backend, creating a single unified service.
 
 ## Current Status
 
