@@ -91,3 +91,7 @@ alembic/versions/*.pyc
 *.tmp
 *.temp
 .cache/
+
+# Claude Code
+.claude/
+CLAUDE.md
